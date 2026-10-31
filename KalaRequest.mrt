@@ -6,7 +6,7 @@
     <DataSources isList="true" count="1">
       <DataSource1 Ref="2" type="Stimulsoft.Report.Dictionary.StiBusinessObjectSource" isKey="true">
         <Alias>DataSource1</Alias>
-        <Columns isList="true" count="8">
+        <Columns isList="true" count="9">
           <value>ORIGINAL,CodeKala,CodeKala,CodeKala,System.String,c33dd156f1c6429786288e31723e8406</value>
           <value>KalaName,System.String</value>
           <value>KalaTeadCount,System.Int32</value>
@@ -15,6 +15,7 @@
           <value>SematName,System.String</value>
           <value>Tozihat,System.String</value>
           <value>TaiidKonandeName,System.String</value>
+          <value>DarkhastKonandeName,System.String</value>
         </Columns>
         <Dictionary isRef="1" />
         <Key>74aca8a9da6e4ed384273037e92f5e1c</Key>
@@ -3486,7 +3487,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <VertAlignment>Center</VertAlignment>
             </DataDataSource1_KalaTeadCount>
 
-            <DataDataSource1_UserName Ref="41" type="Text" isKey="true">
+            <DataDataSource1_DarkhastKonandeName Ref="41" type="Text" isKey="true">
               <Border>All;Black;1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
@@ -3497,15 +3498,15 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
-              <Name>DataDataSource1_UserName</Name>
+              <Name>DataDataSource1_DarkhastKonandeName</Name>
               <Page isRef="3" />
               <Parent isRef="26" />
-              <Text>{DataSource1.UserName}</Text>
+              <Text>{DataSource1.DarkhastKonandeName}</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </DataDataSource1_UserName>
+            </DataDataSource1_DarkhastKonandeName>
 
             <StartPointPrimitive4 Ref="31" type="Stimulsoft.Report.Components.StiStartPointPrimitive" isKey="true">
               <ClientRectangle>0.4,0,0,0</ClientRectangle>
