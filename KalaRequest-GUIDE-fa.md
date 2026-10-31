@@ -9,15 +9,16 @@
 | # | درخواست شما | وضعیت | محل تغییر |
 |---|-------------|-------|-----------|
 | ۱ | نام و امضای انباردار و تاییدکننده اشتباه است | ✅ انجام شد — **باکس «انباردار» حذف شد**، فقط «تائیدکننده (مدیر عامل)» می‌ماند | `PageFooterBand1` |
-| ۲ | تعداد کالا صفر چاپ می‌شود | 🔍 علت‌یابی شد — **رفع آن در بک‌اند است** (بخش ۵) | — |
+| ۲ | تعداد کالا صفر چاپ می‌شود | ✅ **علت قطعی پیدا شد** — خطِ `KalaTeadCount` در متد کامنت بود (بخش ۵) | `KalaRequest-Backend.cs` |
 | ۳ | ستون شماره درخواست کوچک شود و اول قرار بگیرد | ✅ انجام شد — از ۷cm به ۲.۶cm و راست‌ترین ستون | `HeaderBand2` + `DataDataSource1` |
 | ۴ | توضیحات هر درخواست اضافه شود | ✅ انجام شد — ستون جدید «توضیحات» | ستون `Tozihat` |
-| ۵ | نام درخواست‌کننده اضافه شود | ✅ انجام شد — بدون نیاز به تغییر کد (از `UserName` موجود استفاده شد) | ستون `UserName` |
+| ۵ | نام درخواست‌کننده اضافه شود | ✅ انجام شد — فیلدِ جدید `DarkhastKonandeName` (کشف شد که `UserName` در واقع انباردار است) | ستون `DarkhastKonandeName` |
 | ۶ | توضیحاتِ بلند مدیریت شود | ✅ انجام شد — ردیف به‌اندازه‌ی متن رشد می‌کند و همه‌ی سلول‌ها هم‌ارتفاع می‌شوند | `GrowToHeight` |
 | ۷ | درخواست‌های زیاد به صفحه‌ی دوم بروند | ✅ انجام شد — جدول ادامه می‌یابد، **سرستون‌ها در هر صفحه تکرار** می‌شوند، شماره صفحه اضافه شد | `PrintOnAllPages` |
 
-> همه‌ی تغییرات داخل خود فایل `.mrt` انجام شده؛ **هیچ تغییری در کد لازم نیست** مگر دو خطِ بخش ۶
-> (که فقط برای ستون «توضیحات» و «نام تاییدکننده» است).
+> تغییراتِ چیدمان داخل خودِ فایل `.mrt` است. برای رفعِ **صفر شدنِ تعداد** و آمدنِ داده‌ی
+> دو ستونِ جدید، باید متدِ `GetListOfTaminDarkhastViewModel` را با نسخه‌ی فایل
+> **`KalaRequest-Backend.cs`** جایگزین کنید و ۳ پراپرتی به `DarkhastViewModel` اضافه کنید (بخش ۷).
 
 ---
 
@@ -82,129 +83,180 @@
 ## ۴. ستون‌های جدیدِ دیکشنری
 
 ```xml
-<Columns isList="true" count="8">
+<Columns isList="true" count="9">
   ...
-  <value>Tozihat,System.String</value>          <!-- توضیحات هر درخواست  -->
-  <value>TaiidKonandeName,System.String</value> <!-- نام تاییدکننده       -->
+  <value>Tozihat,System.String</value>              <!-- توضیحات هر درخواست   -->
+  <value>TaiidKonandeName,System.String</value>     <!-- نام تاییدکننده        -->
+  <value>DarkhastKonandeName,System.String</value>  <!-- نام درخواست‌کننده      -->
 </Columns>
 ```
 
-ستون `SematName` همچنان در دیکشنری هست اما دیگر در خروجی استفاده نمی‌شود
-(می‌توانید بعداً حذف کنید یا در جای دیگری به‌کار ببرید).
+| ستون | سلول متصل در گزارش |
+|------|---------------------|
+| `Tozihat` | `DataDataSource1_Tozihat` — ستون «توضیحات» |
+| `TaiidKonandeName` | `Text6` در پانویس، زیر امضا |
+| `DarkhastKonandeName` | `DataDataSource1_DarkhastKonandeName` — ستون «درخواست‌کننده» |
+
+ستون‌های `UserName` (انباردار) و `SematName` همچنان در دیکشنری هستند اما دیگر
+در خروجی استفاده نمی‌شوند (می‌توانید بعداً حذف کنید).
 
 ---
 
-## ۵. چرا «تعداد کالا» صفر چاپ می‌شود؟
+## ۵. چرا «تعداد کالا» صفر چاپ می‌شد؟ — پاسخِ قطعی
 
-سمتِ فایل `mrt` کاملاً سالم است:
-
-```xml
-<value>KalaTeadCount,System.Int32</value>          <!-- تعریف ستون -->
-<Text>{DataSource1.KalaTeadCount}</Text>           <!-- اتصال سلول -->
-```
-
-پس مشکل از **داده** است. چهار علتِ محتمل، به ترتیبِ احتمال:
-
-### علت ۱ (محتمل‌ترین) — مقدار در مدل/کوئری اصلاً پر نمی‌شود
-`KalaTeadCount` از نوع `int` (غیر nullable) است. اگر در `Select` مقداردهی نشود،
-مقدار پیش‌فرض `default(int)` یعنی **۰** چاپ می‌شود.
-بقیه ستون‌ها از نوع `string` هستند، برای همین خالی می‌ماندند و کسی متوجه نمی‌شد.
-
-**چک کنید:** در دیباگر روی `data` یک breakpoint بگذارید و مقدار `KalaTeadCount`
-را در اولین ردیف ببینید. اگر همان‌جا هم ۰ است → مشکل از کوئری است.
-
-### علت ۲ — نام فیلد در مدل با نامِ داخل `mrt` یکی نیست
-فایل گزارش این نام‌ها را انتظار دارد:
-
-```
-CodeKala · KalaName · KalaTeadCount · ShomareDarkhastslist · UserName · SematName
-```
-
-> ⚠️ نکته‌ی مهم: «تعداد» درستش `Tedad` است اما در این فایل **`Tead`** نوشته شده
-> (`KalaTeadCount`). اگر در مدل خودتان `KalaTedadCount` یا `TedadKala` دارید،
-> Stimulsoft مقدار را پیدا نمی‌کند و برای `Int32` صفر می‌گذارد.
-
-**رفع:** یا نامِ مدل را به `KalaTeadCount` تغییر دهید، یا در خودِ mrt
-(دیزاینر → Dictionary → DataSource1 → Columns) نام ستون را با مدل یکی کنید.
-
-### علت ۳ — فیلد nullable است و مقدار `null` دارد
-اگر `int? KalaTeadCount` تعریف شده و مقدارش `null` است، چون نوعِ ستون در mrt
-`System.Int32` (غیر nullable) است، مقدار به ۰ تبدیل می‌شود.
-
-### علت ۴ — از `RegData` به‌جای `RegBusinessObject` استفاده می‌کنید
-ADO.NET نوع nullable ندارد، بنابراین `null` همان `0` می‌شود.
-برای business object باید حتماً `RegBusinessObject` + `Dictionary.Synchronize()` باشد.
-
-### اگر می‌خواهید موقتاً صفر «خالی» چاپ شود
-در دیزاینر، سلولِ `DataDataSource1_KalaTeadCount` را باز کنید و متن را به این عبارت تغییر دهید:
-
-```
-{IIF(DataSource1.KalaTeadCount > 0, DataSource1.KalaTeadCount, "")}
-```
-
-> توصیه نمی‌شود — صفرِ واقعی را پنهان می‌کند و دیگر متوجه نمی‌شوید کِی درست شد.
-> از آن فقط برای تست استفاده کنید.
-
----
-
-## ۶. تنها تغییرِ لازم در بک‌اند (دو خط)
+بعد از دیدنِ متدِ `GetListOfTaminDarkhastViewModel`، علت دقیقاً مشخص شد:
 
 ```csharp
-// مدلی که به گزارش پاس می‌دهید — فقط این دو پراپرتی اضافه شود:
-public class KalaRequestReportDto
-{
-    public string CodeKala             { get; set; }
-    public string KalaName             { get; set; }
-    public int    KalaTeadCount        { get; set; }   // رفعِ صفر: اینجا باید پر شود
-    public string ShomareDarkhastslist { get; set; }
-    public string UserName             { get; set; }   // = نام درخواست‌کننده
-    public string SematName            { get; set; }
+//KalaTeadCount = db.Tamin_Tbls
+//    .Where(k => k.KalaId == g.Key)
+//    .Sum(r => r.KalaTead),
+```
 
-    public string Tozihat              { get; set; }   // ➕ جدید: توضیحات هر درخواست
-    public string TaiidKonandeName     { get; set; }   // ➕ جدید: نام مدیر عامل
+**این خط کاملاً کامنت (`//`) شده بود.** چون `KalaTeadCount` از نوع `int` (غیر nullable)
+است، هرگز مقداردهی نشد و مقدارِ پیش‌فرض یعنی **۰** به گزارش رفت. بقیه‌ی فیلدها
+از نوع `string` بودند، برای همین خالی می‌ماندند و کسی متوجه نشده بود.
+
+### سه مشکلِ دیگرِ همان متد (که همزمان اصلاح شد)
+
+| # | مشکل | اثر |
+|---|------|-----|
+| ۱ | `join` روی `Tamin_Tbls` انجام شده اما خروجی‌اش (`j`) **هیچ‌جا استفاده نشده** | فقط ردیف‌ها را ضرب می‌کرد و هر `Sum`/`First` را خراب می‌کرد |
+| ۲ | همین اتفاق برای `Darkhast_Tbls`، `AnbarDarkhast_Tbls` و `ElamiehErsal_Tbls` (همه ۱:N) | یک ردیف واقعی به چند ده ردیف تبدیل می‌شد |
+| ۳ | `g.SematId` و `d.CodeKala` وقتی ردیفِ مرتبط نباشد `null` است | `NullReferenceException` → افتادن در `catch` → برگشتِ `null` (کلِ گزارش خالی) |
+
+> این‌ها یعنی حتی اگر خطِ `KalaTeadCount` را از حالتِ کامنت درمی‌آوردید،
+> باز هم به‌خاطر ضرب شدنِ ردیف‌ها عددِ درستی نمی‌دادید.
+
+### ⚠️ یک اشتباهِ دیگر که در کد پیدا شد
+
+```csharp
+Username    = mm.Title + "/" + vv.F_Name + " " + vv.L_Name,   // از زنجیره‌ی Anbar
+AnbarDar    = mm.Title + "/" + vv.F_Name + " " + vv.L_Name,   // دقیقاً همان!
+Taeedkonande= m.Title  + "/" + v.F_Name  + " " + v.L_Name,    // از زنجیره‌ی Darkhast
+```
+
+`Username` و `AnbarDar` **یکی هستند** و هر دو از مسیرِ «انبار» می‌آیند.
+پس `UserName` در واقع **نامِ انباردار** است، نه درخواست‌کننده.
+
+به همین دلیل ستون «درخواست‌کننده» در گزارش از `{DataSource1.UserName}`
+به **`{DataSource1.DarkhastKonandeName}`** تغییر یافت (فیلدِ جدید در بخش ۶).
+
+---
+
+## ۶. کد بک‌اند — متدِ کامل و اصلاح‌شده
+
+نسخه‌ی کامل در فایل **`KalaRequest-Backend.cs`** (کنار همین راهنما) آماده است؛
+کافی است متدِ فعلی را با آن جایگزین کنید. خلاصه‌ی تغییرات:
+
+### الف) رفعِ صفر
+
+```csharp
+// قبل:  KalaTeadCount = g.FirstOrDefault().???  (کامنت بود → 0)
+// بعد:
+KalaTeadCount = grp.Sum(x => x.KalaTead ?? 0),
+```
+
+> اگر `KalaTead` در مدل شما `int` غیر-nullable است، `?? 0` را حذف کنید تا warning نگیرید.
+
+### ب) حذفِ joinهای مضرّ (Lookup به‌جای join)
+
+```csharp
+// کالاهایی که اعلامیه‌ی ارسال دارند => نباید در لیست خرید بیایند
+var kalaErsalShode = ListElamieErsal
+    .GroupBy(x => x.KalaId)
+    .ToDictionary(g => g.Key, g => true);
+
+// مشخصات کالا
+var kalaById = ListSharhKala
+    .GroupBy(k => k.KalaId)
+    .ToDictionary(g => g.Key, g => g.First());
+```
+
+و به‌جای پنج `join` متوالی:
+
+```csharp
+var item =
+    (from a in ListModiriat
+     where !kalaErsalShode.ContainsKey(a.KalaId)     // ارسال نشده باشد
+     group a by a.KalaId into grp
+     let kala = kalaById.ContainsKey(grp.Key) ? kalaById[grp.Key] : null
+     select new DarkhastViewModel { ... })
+    .ToList();
+```
+
+حالا **دقیقاً یک ردیف به‌ازای هر رکوردِ مدیریت** داریم، نه حاصل‌ضربِ پنج جدول.
+
+### ج) ایمن‌سازی در برابر null
+
+```csharp
+CodeKala = (kala == null || kala.CodeKala == null) ? "" : kala.CodeKala,
+...
+DarkhastKonandeName = darkhastKonandeByKala.ContainsKey(grp.Key)
+    ? darkhastKonandeByKala[grp.Key] : "",
+```
+
+### د) یکپارچه‌سازیِ فیلترها
+
+سه بلوکِ `if` جداگانه (که در حالتِ بدون فیلتر اصلاً مرتب نمی‌کردند) به یک زنجیره
+تبدیل شد و **همیشه** مرتب‌سازی انجام می‌شود:
+
+```csharp
+IEnumerable<DarkhastViewModel> result = item;
+
+if (!string.IsNullOrWhiteSpace(Filter))
+{
+    var f = Filter.Trim();
+    result = result.Where(r =>
+           (r.KalaName             != null && r.KalaName.Contains(f))
+        || (r.CodeKala             != null && r.CodeKala.Contains(f))
+        || (r.ShomareDarkhastslist != null && r.ShomareDarkhastslist.Contains(f)));
+}
+
+if (Date.HasValue)
+{
+    var d = Date.Value.Date;
+    result = result.Where(r => r.DateSabt.Date == d);
+}
+
+return result.OrderByDescending(r => r.DateSabt).ToList();
+```
+
+---
+
+## ۷. سه پراپرتی جدیدِ `DarkhastViewModel`
+
+```csharp
+public class DarkhastViewModel
+{
+    // ... پراپرتی‌های موجود ...
+
+    public string Tozihat             { get; set; }   // ➕ توضیحاتِ هر درخواست
+    public string DarkhastKonandeName { get; set; }   // ➕ نامِ درخواست‌کننده
+    public string TaiidKonandeName    { get; set; }   // ➕ نامِ تاییدکننده (مدیر عامل)
 }
 ```
 
-```csharp
-var data = db.KalaRequests
-    .Where(...)
-    .Select(x => new KalaRequestReportDto
-    {
-        CodeKala             = x.Kala.Code,
-        KalaName             = x.Kala.Name,
-        KalaTeadCount        = x.Tedad,            // <<-- منبعِ مقدار واقعیِ تعداد
-        ShomareDarkhastslist = x.ShomareDarkhast,
-        UserName             = x.User.FullName,    // نام درخواست‌کننده
-        SematName            = x.User.Semat,
-        Tozihat              = x.Tozihat,          // <<-- جدید
-        TaiidKonandeName     = modirAmelName,      // <<-- جدید (نام مدیر عامل)
-    })
-    .ToList();
+| پراپرتی | منبع در متد | ستونِ گزارش |
+|---------|-------------|-------------|
+| `Tozihat` | `string.Join(" \| ", grp.Select(x => x.Sharh).Distinct())` | ستون «توضیحات» |
+| `DarkhastKonandeName` | زنجیره‌ی `Darkhast → Semat → User` | ستون «درخواست‌کننده» |
+| `TaiidKonandeName` | زنجیره‌ی `Modiriat → Semat → User` | پانویس، زیر امضا |
+| `UserName` | زنجیره‌ی `Anbar → Semat → User` | *(دیگر در گزارش استفاده نمی‌شود)* |
 
+> 🔎 **تأیید کنید:** منبعِ `TaiidKonandeName` را بر اساس منطقِ سیستم‌تان چک کنید.
+> من آن را از `Modiriat.SematId / UserId` گرفتم (مدیریت = تاییدکننده). اگر تاییدکننده
+> در سیستم شما یک کاربرِ ثابت است (مثلاً مدیرعاملِ مشخص)، کافی است آن یک خط را
+> با مقدارِ دلخواه جایگزین کنید. بلوکِ جایگزین در انتهای فایل `.cs` آماده است.
+
+### اتصال به گزارش (اگر این بخش را دارید، تغییر نمی‌خواهد)
+
+```csharp
 var report = new StiReport();
 report.Load(Server.MapPath("~/Reports/KalaRequest.mrt"));
 report.RegBusinessObject("KalaRequest", data);   // نام باید دقیقاً KalaRequest باشد
 report.Dictionary.Synchronize();                 // حتماً بعد از RegBusinessObject
 report.Render();
 ```
-
-> تا وقتی این دو پراپرتی را اضافه نکنید، ستون «توضیحات» خالی می‌ماند
-> (و بسته به نسخه‌ی Stimulsoft ممکن است خطای «ستون یافت نشد» بگیرید).
-
----
-
-## ۷. نکته درباره‌ی ستون «درخواست‌کننده»
-
-این ستون به `{DataSource1.UserName}` متصل است — یعنی **همین الان کار می‌کند و
-هیچ تغییری در کد لازم ندارد**.
-
-اگر `UserName` در سیستم شما کدِ کاربری است (مثل `m.foroughi`) و نه نام کامل،
-دو راه دارید:
-
-* **راه ساده:** در کوئری به‌جای نام کاربری، نام کامل را در `UserName` بگذارید:
-  `UserName = x.User.FullName`
-* **راه تمیز:** پراپرتی `DarkhastKonandeName` به مدل اضافه کنید و در دیزاینر
-  متنِ سلول `DataDataSource1_UserName` را به `{DataSource1.DarkhastKonandeName}` تغییر دهید.
 
 ---
 
@@ -300,6 +352,7 @@ report.Render();
 | فایل | توضیح |
 |------|-------|
 | `KalaRequest.mrt` | ⭐ فایل اصلی و نهایی — همین را جایگزین کنید |
+| `KalaRequest-Backend.cs` | ⭐ **متدِ اصلاح‌شده‌ی `GetListOfTaminDarkhastViewModel`** — جایگزینِ متدِ فعلی‌تان کنید |
 | `KalaRequest-preview.png` | پیش‌نمایشِ ۲ صفحه‌ای با داده‌ی نمونه — رشدِ ردیف برای توضیحاتِ بلند + تکرارِ سرستون در صفحه‌ی ۲ |
 | `Report.jpg` | نمونه‌ی چاپِ قبلی که خودتان فرستادید (تغییر نکرده) |
 | `KalaRequest-GUIDE-fa.md` | این راهنما |
