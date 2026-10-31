@@ -43,7 +43,7 @@
         <PageFooterBand1 Ref="4" type="PageFooterBand" isKey="true">
           <Brush>Transparent</Brush>
           <ClientRectangle>0,24.1,19,3.6</ClientRectangle>
-          <Components isList="true" count="4">
+          <Components isList="true" count="3">
             <Image1 Ref="5" type="Image" isKey="true">
               <Brush>Transparent</Brush>
               <ClientRectangle>0.4,0.1,4,2</ClientRectangle>
@@ -62,10 +62,10 @@
 
             <Text6 Ref="6" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>0.4,2.1,4,0.6</ClientRectangle>
+              <ClientRectangle>0.4,2.3,4,0.6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,11</Font>
+              <Font>Vazir,11</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Text6</Name>
@@ -78,29 +78,12 @@
               <VertAlignment>Center</VertAlignment>
             </Text6>
 
-            <Text9 Ref="9" type="Text" isKey="true">
-              <Brush>Transparent</Brush>
-              <ClientRectangle>0.4,2.7,4,0.6</ClientRectangle>
-              <Conditions isList="true" count="0" />
-              <Expressions isList="true" count="0" />
-              <Font>B Yekan,11</Font>
-              <HorAlignment>Center</HorAlignment>
-              <Margins>0,0,0,0</Margins>
-              <Name>Text9</Name>
-              <Page isRef="3" />
-              <Parent isRef="4" />
-              <Text>تائیدکننده (مدیر عامل)</Text>
-              <TextBrush>Black</TextBrush>
-              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
-              <Type>Expression</Type>
-              <VertAlignment>Center</VertAlignment>
-            </Text9>
                       <Text_PageNumber Ref="42" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <ClientRectangle>13.5,2.9,5,0.6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,9</Font>
+              <Font>Vazir,9</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Text_PageNumber</Name>
@@ -128,7 +111,7 @@
               <ClientRectangle>0,0,19,2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,16</Font>
+              <Font>Vazir,16</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Text1</Name>
@@ -3221,7 +3204,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>16,0.4,2.6,1.2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3242,7 +3225,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>13.8,0.4,2.2,1.2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3263,7 +3246,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>10,0.4,3.8,1.2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3284,7 +3267,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>5.6,0.4,4.4,1.2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3305,7 +3288,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>3,0.4,2.6,1.2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3326,7 +3309,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>0.4,0.4,2.6,1.2</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3389,7 +3372,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>16,0,2.6,0.8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3410,7 +3393,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>13.8,0,2.2,0.8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3431,7 +3414,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>10,0,3.8,0.8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3452,7 +3435,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>5.6,0,4.4,0.8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,9</Font>
+              <Font>Vazir,9</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3473,7 +3456,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>3,0,2.6,0.8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
@@ -3494,7 +3477,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <ClientRectangle>0.4,0,2.6,0.8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
-              <Font>B Yekan,10</Font>
+              <Font>Vazir,10</Font>
               <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
