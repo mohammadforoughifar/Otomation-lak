@@ -1,0 +1,774 @@
+@page "/shop/opening-balances"
+@using Inventory.Shared
+@using Inventory.Shared.Dtos
+@inject IPartyService PartySvc
+@inject IStockService StockSvc
+@inject IWarehouseService WarehouseSvc
+@inject IProductService ProductSvc
+@inject IAuthState Auth
+@inject IToastService Toast
+@inject NavigationManager Nav
+
+<PageTitle>افتتاح حساب فروشگاهی — طرف حساب‌ها و اول دوره</PageTitle>
+
+<div class="page-head d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+        <h1 class="h3 fw-bold text-dark mb-1">
+            <i class="bi bi-journal-plus text-primary me-2"></i>افتتاح حساب و مانده اول دوره
+        </h1>
+        <div class="text-muted fs-8">
+            ثبت مانده حساب ابتدای دورهٔ مشتریان و تأمین‌کنندگان (بدهکار و بستانکار) و انعکاس مستقیم در گزارش حساب و کتاب
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary btn-sm" href="/operations/reports/party-accounts">
+            <i class="bi bi-journal-bookmark-fill me-1"></i> مشاهده گزارش حساب و کتاب (بدهکار و بستانکار)
+        </a>
+        <button class="btn btn-outline-secondary btn-sm" @onclick="LoadAllAsync" disabled="@loading">
+            <i class="bi bi-arrow-clockwise"></i> به‌روزرسانی
+        </button>
+    </div>
+</div>
+
+@* ---------- کارت‌های خلاصه افتتاح حساب طرف حساب‌ها ---------- *@
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fs-8 fw-600">جمع بدهکاری اول دوره (طلب ما)</span>
+                        <h4 class="fw-800 text-danger num mt-2 mb-0">@SumOpeningDebit.Money() <span class="fs-8 fw-normal">ریال</span></h4>
+                    </div>
+                    <div class="badge bg-soft-danger text-danger p-3 rounded-circle">
+                        <i class="bi bi-arrow-down-left-circle fs-4"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-muted fs-9">@OpeningDebtorsCount.Num() طرف حساب بدهکار در ابتدای دوره</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fs-8 fw-600">جمع بستانکاری اول دوره (بدهی ما)</span>
+                        <h4 class="fw-800 text-primary num mt-2 mb-0">@SumOpeningCredit.Money() <span class="fs-8 fw-normal">ریال</span></h4>
+                    </div>
+                    <div class="badge bg-soft-primary text-primary p-3 rounded-circle">
+                        <i class="bi bi-arrow-up-right-circle fs-4"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-muted fs-9">@OpeningCreditorsCount.Num() طرف حساب بستانکار در ابتدای دوره</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fs-8 fw-600">تراز خالص افتتاح حساب</span>
+                        <h4 class="fw-800 @(OpeningNet >= 0 ? "text-danger" : "text-primary") num mt-2 mb-0">
+                            @Math.Abs(OpeningNet).Money()
+                            <span class="fs-8 fw-normal">@(OpeningNet > 0 ? "بدهکار" : OpeningNet < 0 ? "بستانکار" : "تراز")</span>
+                        </h4>
+                    </div>
+                    <div class="badge bg-soft-info text-info p-3 rounded-circle">
+                        <i class="bi bi-calculator fs-4"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-muted fs-9">تفاضل بدهکار و بستانکار اول دوره</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fs-8 fw-600">طرف حساب‌های دارای افتتاحیه</span>
+                        <h4 class="fw-800 text-success num mt-2 mb-0">@WithOpeningCount.Num() <span class="fs-8 fw-normal">از @allParties.Count.Num()</span></h4>
+                    </div>
+                    <div class="badge bg-soft-success text-success p-3 rounded-circle">
+                        <i class="bi bi-people-fill fs-4"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-muted fs-9">آماده در گزارش حساب و کتاب</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ---------- تب‌های صفحه افتتاح حساب ---------- *@
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white border-bottom-0 pb-0 pt-3">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+                <button class="nav-link @(activeTab == TabParties ? "active fw-bold text-primary" : "text-secondary")"
+                        @onclick="SelectTabParties">
+                    <i class="bi bi-people me-1"></i> افتتاح حساب طرف حساب‌ها (بدهکار / بستانکار)
+                    <span class="badge bg-light text-dark ms-1 num">@allParties.Count.Num()</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link @(activeTab == TabGoods ? "active fw-bold text-primary" : "text-secondary")"
+                        @onclick="SelectTabGoods">
+                    <i class="bi bi-box-seam me-1"></i> موجودی اول دوره کالاها (انبار)
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body p-3">
+        @if (activeTab == TabParties)
+        {
+            @* ---------- فرم ثبت / ویرایش سریع افتتاح حساب طرف حساب ---------- *@
+            <div class="border rounded-3 p-3 bg-light mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div class="fw-bold text-dark">
+                        <i class="bi bi-pencil-square text-primary me-1"></i>
+                        @(selectedPartyId > 0 ? $"ثبت / ویرایش افتتاح حساب: {SelectedPartyName}" : "ثبت افتتاح حساب طرف حساب")
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" @onclick="OpenNewCustomerModal">
+                            <i class="bi bi-person-plus"></i> مشتری جدید
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="OpenNewSupplierModal">
+                            <i class="bi bi-truck"></i> تأمین‌کننده جدید
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">انتخاب طرف حساب (مشتری یا تأمین‌کننده) <span class="text-danger">*</span></label>
+                        <SearchSelect Items="partyLookup" Value="selectedPartyId" ValueChanged="OnPartySelected"
+                                      Placeholder="جستجو و انتخاب طرف حساب…" />
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">وضعیت حساب در ابتدای دوره <span class="text-danger">*</span></label>
+                        <div class="btn-group w-100" role="group">
+                            <button type="button"
+                                    class="btn @(formSide == SideDebit ? "btn-danger" : "btn-outline-danger")"
+                                    @onclick="SetSideDebit">
+                                <i class="bi bi-arrow-down-left"></i> بدهکار (طلب ما)
+                            </button>
+                            <button type="button"
+                                    class="btn @(formSide == SideCredit ? "btn-primary" : "btn-outline-primary")"
+                                    @onclick="SetSideCredit">
+                                <i class="bi bi-arrow-up-right"></i> بستانکار (بدهی ما)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">
+                            مبلغ @(formSide == SideDebit ? "بدهکاری" : "بستانکاری") اول دوره (ریال) <span class="text-danger">*</span>
+                        </label>
+                        <input class="form-control num fw-bold" dir="ltr" inputmode="numeric"
+                               placeholder="مثلاً ۲۵,۰۰۰,۰۰۰"
+                               value="@formAmountText"
+                               @oninput="OnFormAmountInput" />
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                        <label class="form-label">تاریخ افتتاح حساب</label>
+                        <DatePicker @bind-Value="formDate" AllowClear="true" />
+                    </div>
+
+                    <div class="col-12 col-md-9">
+                        <label class="form-label">شرح / بابت</label>
+                        <input class="form-control"
+                               placeholder="مثلاً: مانده حساب انتقالی از دفتر قبلی / سال قبل"
+                               @bind="formDescription" />
+                    </div>
+
+                    <div class="col-12 col-md-3 d-flex gap-2">
+                        <button type="button" class="btn btn-success flex-grow-1" @onclick="SaveOpeningAsync" disabled="@saving">
+                            @if (saving)
+                            {
+                                <span class="spinner-border spinner-border-sm ms-1"></span>
+                            }
+                            <i class="bi bi-check2-circle"></i> ثبت افتتاح حساب
+                        </button>
+                        @if (selectedPartyId > 0)
+                        {
+                            <button type="button" class="btn btn-outline-secondary" title="پاک کردن فرم" @onclick="ResetForm">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* ---------- فیلترها و جستجوی جدول طرف حساب‌ها ---------- *@
+            <div class="row g-2 mb-3 align-items-center">
+                <div class="col-12 col-md-4">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control"
+                               placeholder="جستجوی نام، موبایل، تلفن یا شرح افتتاح حساب..."
+                               @bind="searchText" @bind:event="oninput" />
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <select class="form-select form-select-sm" @bind="typeFilter">
+                        <option value="all">همه طرف حساب‌ها (مشتری و تأمین‌کننده)</option>
+                        <option value="customer">فقط مشتریان</option>
+                        <option value="supplier">فقط تأمین‌کنندگان</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <select class="form-select form-select-sm" @bind="sideFilter">
+                        <option value="all">همه وضعیت‌های اول دوره</option>
+                        <option value="with_opening">دارای افتتاح حساب (بدهکار یا بستانکار)</option>
+                        <option value="debit">فقط بدهکاران اول دوره</option>
+                        <option value="credit">فقط بستانکاران اول دوره</option>
+                        <option value="zero">بدون مانده اول دوره</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2 text-md-end">
+                    <span class="fs-8 text-muted num">@FilteredParties.Count.Num() طرف حساب</span>
+                </div>
+            </div>
+
+            @if (loading)
+            {
+                <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>
+            }
+            else if (FilteredParties.Count == 0)
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-people fs-1 d-block mb-2 opacity-50"></i>
+                    <span>طرف حسابی با شرایط انتخابی یافت نشد.</span>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light fs-8">
+                            <tr>
+                                <th>نام طرف حساب</th>
+                                <th>نوع</th>
+                                <th>موبایل / تلفن</th>
+                                <th>تاریخ افتتاح</th>
+                                <th>شرح اول دوره</th>
+                                <th class="text-start">بدهکار اول دوره (ریال)</th>
+                                <th class="text-start">بستانکار اول دوره (ریال)</th>
+                                <th>وضعیت اول دوره</th>
+                                <th class="text-start">مانده کل فعلی (با گردش)</th>
+                                <th class="text-end">عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in FilteredParties)
+                            {
+                                var row = p;
+                                <tr class="@(selectedPartyId == row.Id ? "table-primary-subtle" : "")">
+                                    <td class="fw-bold">@row.Name</td>
+                                    <td>
+                                        @if (row.Type == PartyType.Customer)
+                                        {
+                                            <span class="badge bg-soft-info text-info"><i class="bi bi-person"></i> مشتری</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-soft-warning text-warning"><i class="bi bi-truck"></i> تأمین‌کننده</span>
+                                        }
+                                    </td>
+                                    <td class="num fs-8 text-muted">@(row.Mobile ?? row.Phone ?? "—")</td>
+                                    <td class="num fs-8">@(row.OpeningDate.HasValue ? row.OpeningDate.Value.ToFaDate() : "—")</td>
+                                    <td class="fs-8 text-muted">@(string.IsNullOrWhiteSpace(row.OpeningDescription) ? "—" : row.OpeningDescription)</td>
+                                    <td class="text-start num fw-bold @(row.OpeningDebit > 0 ? "text-danger" : "text-muted")">
+                                        @(row.OpeningDebit > 0 ? row.OpeningDebit.Money() : "۰")
+                                    </td>
+                                    <td class="text-start num fw-bold @(row.OpeningCredit > 0 ? "text-primary" : "text-muted")">
+                                        @(row.OpeningCredit > 0 ? row.OpeningCredit.Money() : "۰")
+                                    </td>
+                                    <td>
+                                        @if (row.OpeningDebit > 0)
+                                        {
+                                            <span class="badge bg-soft-danger text-danger">بدهکار اول دوره</span>
+                                        }
+                                        else if (row.OpeningCredit > 0)
+                                        {
+                                            <span class="badge bg-soft-primary text-primary">بستانکار اول دوره</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted">ثبت‌نشده</span>
+                                        }
+                                    </td>
+                                    <td class="text-start">
+                                        <span class="num fw-bold @(row.Balance > 0 ? "text-danger" : row.Balance < 0 ? "text-primary" : "text-success")">
+                                            @Math.Abs(row.Balance).Money()
+                                        </span>
+                                        <span class="badge @(row.Balance > 0 ? "bg-soft-danger text-danger" : row.Balance < 0 ? "bg-soft-primary text-primary" : "bg-soft-success text-success") ms-1">
+                                            @row.BalanceStatus
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="d-flex justify-content-end gap-1">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    title="انتخاب و ویرایش افتتاح حساب"
+                                                    @onclick="() => SelectForEdit(row)">
+                                                <i class="bi bi-pencil-square"></i> @(row.OpeningDebit > 0 || row.OpeningCredit > 0 ? "ویرایش" : "ثبت اول دوره")
+                                            </button>
+                                            @if (row.OpeningDebit > 0 || row.OpeningCredit > 0)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                        title="صفر کردن افتتاح حساب"
+                                                        @onclick="() => ClearOpeningAsync(row)">
+                                                    <i class="bi bi-eraser"></i>
+                                                </button>
+                                            }
+                                            <a class="btn btn-sm btn-light"
+                                               title="مشاهده در گزارش حساب و کتاب"
+                                               href="@($"/operations/reports/party-accounts?partyId={row.Id}")">
+                                                <i class="bi bi-journal-text text-secondary"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr>
+                                <td colspan="5" class="text-end">جمع ردیف‌های نمایش‌داده‌شده:</td>
+                                <td class="text-start num text-danger">@FilteredParties.Sum(x => x.OpeningDebit).Money()</td>
+                                <td class="text-start num text-primary">@FilteredParties.Sum(x => x.OpeningCredit).Money()</td>
+                                <td colspan="3"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+        }
+        else
+        {
+            @* ---------- تب دوم: ثبت موجودی اول دوره کالاها (افتتاح انبار) ---------- *@
+            <div class="border rounded-3 p-3 bg-light mb-3">
+                <div class="fw-bold text-dark mb-2">
+                    <i class="bi bi-box-seam text-primary me-1"></i>
+                    ثبت موجودی اول دوره کالا در انبار
+                </div>
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">انبار <span class="text-danger">*</span></label>
+                        <SearchSelect Items="warehouseLookup" Value="stockWarehouseId" ValueChanged="v => stockWarehouseId = v"
+                                      Placeholder="انتخاب انبار…" />
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">کالا <span class="text-danger">*</span></label>
+                        <SearchSelect Items="productLookup" Value="stockProductId" ValueChanged="v => stockProductId = v"
+                                      Placeholder="جستجو و انتخاب کالا…" />
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">موجودی اول دوره <span class="text-danger">*</span></label>
+                        <input class="form-control num" dir="ltr" inputmode="decimal"
+                               placeholder="مقدار" @bind="stockQuantityText" />
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label">تاریخ ثبت</label>
+                        <DatePicker @bind-Value="stockDate" AllowClear="true" />
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <label class="form-label">شرح</label>
+                        <input class="form-control" placeholder="موجودی اول دوره / افتتاحیه انبار" @bind="stockDescription" />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <button type="button" class="btn btn-primary w-100" @onclick="SaveInitialStockAsync" disabled="@savingStock">
+                            @if (savingStock)
+                            {
+                                <span class="spinner-border spinner-border-sm ms-1"></span>
+                            }
+                            <i class="bi bi-check2-circle"></i> ثبت موجودی اول دوره کالا
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-secondary fs-8">فهرست موجودی فعلی کالاها در انبار</span>
+                <a class="btn btn-sm btn-outline-primary" href="/stock">
+                    <i class="bi bi-boxes"></i> مدیریت کامل موجودی انبار
+                </a>
+            </div>
+
+            @if (stockItems.Count == 0)
+            {
+                <div class="text-center py-4 text-muted">هنوز موجودی کالایی ثبت نشده است.</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light fs-8">
+                            <tr>
+                                <th>کالا</th>
+                                <th>کد</th>
+                                <th>انبار</th>
+                                <th>واحد</th>
+                                <th class="text-start">موجودی فعلی</th>
+                                <th class="text-start">میانگین خرید (ریال)</th>
+                                <th class="text-start">ارزش موجودی (ریال)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in stockItems)
+                            {
+                                <tr>
+                                    <td class="fw-500">@s.ProductName</td>
+                                    <td class="num text-muted">@s.ProductCode</td>
+                                    <td>@s.WarehouseName</td>
+                                    <td>@s.Unit</td>
+                                    <td class="text-start num fw-bold">@s.Quantity.Num()</td>
+                                    <td class="text-start num">@s.AvgCost.Money()</td>
+                                    <td class="text-start num text-success fw-bold">@((s.Quantity * s.AvgCost).Money())</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<PartyFormModal Visible="showPartyModal"
+                Type="modalPartyType"
+                Model="null"
+                OnSaved="OnNewPartyCreated"
+                OnCancel="ClosePartyModal" />
+
+@code {
+    private const string TabParties = "parties";
+    private const string TabGoods = "goods";
+    private const string SideDebit = "debit";
+    private const string SideCredit = "credit";
+
+    private string activeTab = TabParties;
+    private bool loading = true;
+    private bool saving;
+    private bool savingStock;
+
+    private List<Party> allParties = new();
+    private List<LookupItem> partyLookup = new();
+
+    private int selectedPartyId;
+    private string formSide = SideDebit;
+    private string formAmountText = "";
+    private DateTime? formDate = DateTime.Today;
+    private string? formDescription = "مانده حساب اول دوره (افتتاح حساب)";
+
+    private string searchText = "";
+    private string typeFilter = "all";
+    private string sideFilter = "all";
+
+    // مودال تعریف طرف حساب جدید
+    private bool showPartyModal;
+    private PartyType modalPartyType = PartyType.Customer;
+
+    // تب موجودی اول دوره کالا
+    private List<LookupItem> warehouseLookup = new();
+    private List<LookupItem> productLookup = new();
+    private List<StockItem> stockItems = new();
+    private int stockWarehouseId;
+    private int stockProductId;
+    private string stockQuantityText = "";
+    private DateTime? stockDate = DateTime.Today;
+    private string? stockDescription = "موجودی اول دوره انبار";
+
+    private decimal SumOpeningDebit => allParties.Sum(p => p.OpeningDebit);
+    private decimal SumOpeningCredit => allParties.Sum(p => p.OpeningCredit);
+    private decimal OpeningNet => SumOpeningDebit - SumOpeningCredit;
+    private int OpeningDebtorsCount => allParties.Count(p => p.OpeningDebit > 0);
+    private int OpeningCreditorsCount => allParties.Count(p => p.OpeningCredit > 0);
+    private int WithOpeningCount => allParties.Count(p => p.OpeningDebit > 0 || p.OpeningCredit > 0);
+
+    private string SelectedPartyName =>
+        allParties.FirstOrDefault(p => p.Id == selectedPartyId)?.Name ?? "";
+
+    private List<Party> FilteredParties
+    {
+        get
+        {
+            IEnumerable<Party> q = allParties;
+            if (typeFilter == "customer")
+                q = q.Where(p => p.Type == PartyType.Customer);
+            else if (typeFilter == "supplier")
+                q = q.Where(p => p.Type == PartyType.Supplier);
+
+            if (sideFilter == "with_opening")
+                q = q.Where(p => p.OpeningDebit > 0 || p.OpeningCredit > 0);
+            else if (sideFilter == "debit")
+                q = q.Where(p => p.OpeningDebit > 0);
+            else if (sideFilter == "credit")
+                q = q.Where(p => p.OpeningCredit > 0);
+            else if (sideFilter == "zero")
+                q = q.Where(p => p.OpeningDebit == 0 && p.OpeningCredit == 0);
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                var s = searchText.Trim().ToLowerInvariant();
+                q = q.Where(p => p.Name.ToLowerInvariant().Contains(s)
+                                 || (p.Mobile != null && p.Mobile.Contains(s))
+                                 || (p.Phone != null && p.Phone.Contains(s))
+                                 || (p.OpeningDescription != null && p.OpeningDescription.ToLowerInvariant().Contains(s)));
+            }
+
+            return q.OrderByDescending(p => p.OpeningDebit + p.OpeningCredit)
+                    .ThenBy(p => p.Name)
+                    .ToList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllAsync();
+    }
+
+    private void SelectTabParties() => activeTab = TabParties;
+
+    private async Task SelectTabGoods()
+    {
+        activeTab = TabGoods;
+        if (warehouseLookup.Count == 0)
+            await LoadGoodsTabAsync();
+    }
+
+    private void SetSideDebit() => formSide = SideDebit;
+    private void SetSideCredit() => formSide = SideCredit;
+
+    private void OnFormAmountInput(ChangeEventArgs e)
+    {
+        formAmountText = Fa.FormatTyping(e.Value?.ToString() ?? "");
+    }
+
+    private async Task LoadAllAsync()
+    {
+        loading = true;
+        try
+        {
+            var list = new List<Party>();
+            try
+            {
+                var customers = await PartySvc.GetAsync(PartyType.Customer);
+                list.AddRange(customers);
+            }
+            catch { }
+
+            try
+            {
+                var suppliers = await PartySvc.GetAsync(PartyType.Supplier);
+                list.AddRange(suppliers);
+            }
+            catch { }
+
+            allParties = list.OrderBy(p => p.Name).ToList();
+            partyLookup = allParties.Select(p => new LookupItem
+            {
+                Id = p.Id,
+                Name = $"{p.Name} ({(p.Type == PartyType.Customer ? "مشتری" : "تأمین‌کننده")})",
+                InfoText = (p.OpeningDebit > 0 || p.OpeningCredit > 0)
+                    ? $"اول دوره: {(p.OpeningDebit > 0 ? p.OpeningDebit.Money() + " بدهکار" : p.OpeningCredit.Money() + " بستانکار")}"
+                    : "بدون مانده اول دوره"
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            Toast.Error(ex.Message);
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task LoadGoodsTabAsync()
+    {
+        try
+        {
+            warehouseLookup = await WarehouseSvc.GetLookupsAsync(activeOnly: true);
+            if (stockWarehouseId == 0 && warehouseLookup.Count > 0)
+                stockWarehouseId = warehouseLookup[0].Id;
+            productLookup = await ProductSvc.GetLookupsAsync();
+            var stockPage = await StockSvc.GetStockAsync(page: 1, pageSize: 100);
+            stockItems = stockPage.Items;
+        }
+        catch (Exception ex)
+        {
+            Toast.Error(ex.Message);
+        }
+    }
+
+    private void OnPartySelected(int id)
+    {
+        selectedPartyId = id;
+        var p = allParties.FirstOrDefault(x => x.Id == id);
+        if (p is null) return;
+
+        if (p.OpeningCredit > 0)
+        {
+            formSide = SideCredit;
+            formAmountText = Fa.FormatTyping(p.OpeningCredit.ToString("0"));
+        }
+        else if (p.OpeningDebit > 0)
+        {
+            formSide = SideDebit;
+            formAmountText = Fa.FormatTyping(p.OpeningDebit.ToString("0"));
+        }
+        else
+        {
+            formSide = p.Type == PartyType.Supplier ? SideCredit : SideDebit;
+            formAmountText = "";
+        }
+
+        formDate = p.OpeningDate ?? DateTime.Today;
+        formDescription = string.IsNullOrWhiteSpace(p.OpeningDescription)
+            ? "مانده حساب اول دوره (افتتاح حساب)"
+            : p.OpeningDescription;
+    }
+
+    private void SelectForEdit(Party p)
+    {
+        OnPartySelected(p.Id);
+    }
+
+    private void ResetForm()
+    {
+        selectedPartyId = 0;
+        formSide = SideDebit;
+        formAmountText = "";
+        formDate = DateTime.Today;
+        formDescription = "مانده حساب اول دوره (افتتاح حساب)";
+    }
+
+    private async Task SaveOpeningAsync()
+    {
+        if (selectedPartyId <= 0)
+        {
+            Toast.Error("لطفاً ابتدا طرف حساب را انتخاب کنید.");
+            return;
+        }
+
+        var amt = Fa.ParseDecimal(formAmountText);
+        if (amt < 0)
+        {
+            Toast.Error("مبلغ افتتاح حساب نمی‌تواند منفی باشد.");
+            return;
+        }
+
+        saving = true;
+        try
+        {
+            var cmd = new PartyOpeningBalanceCommand
+            {
+                PartyId = selectedPartyId,
+                OpeningDebit = formSide == SideDebit ? amt : 0m,
+                OpeningCredit = formSide == SideCredit ? amt : 0m,
+                OpeningDate = formDate ?? DateTime.Today,
+                OpeningDescription = formDescription
+            };
+
+            await PartySvc.SaveOpeningBalanceAsync(cmd);
+            Toast.Success("افتتاح حساب طرف حساب با موفقیت ثبت شد و در گزارش حساب و کتاب قرار گرفت.");
+            await LoadAllAsync();
+            ResetForm();
+        }
+        catch (Exception ex)
+        {
+            Toast.Error(ex.Message);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private async Task ClearOpeningAsync(Party p)
+    {
+        saving = true;
+        try
+        {
+            await PartySvc.SaveOpeningBalanceAsync(new PartyOpeningBalanceCommand
+            {
+                PartyId = p.Id,
+                OpeningDebit = 0,
+                OpeningCredit = 0,
+                OpeningDate = null,
+                OpeningDescription = null
+            });
+            Toast.Success($"مانده اول دوره «{p.Name}» صفر شد.");
+            await LoadAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Toast.Error(ex.Message);
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void OpenNewCustomerModal()
+    {
+        modalPartyType = PartyType.Customer;
+        showPartyModal = true;
+    }
+
+    private void OpenNewSupplierModal()
+    {
+        modalPartyType = PartyType.Supplier;
+        showPartyModal = true;
+    }
+
+    private void ClosePartyModal() => showPartyModal = false;
+
+    private async Task OnNewPartyCreated(Party created)
+    {
+        showPartyModal = false;
+        await LoadAllAsync();
+        OnPartySelected(created.Id);
+    }
+
+    private async Task SaveInitialStockAsync()
+    {
+        if (stockWarehouseId <= 0) { Toast.Error("انبار را انتخاب کنید."); return; }
+        if (stockProductId <= 0) { Toast.Error("کالا را انتخاب کنید."); return; }
+        var qty = Fa.ParseDecimal(stockQuantityText);
+        if (qty < 0) { Toast.Error("مقدار موجودی نمی‌تواند منفی باشد."); return; }
+
+        savingStock = true;
+        try
+        {
+            await StockSvc.AdjustAsync(new AdjustmentCommand
+            {
+                WarehouseId = stockWarehouseId,
+                ProductId = stockProductId,
+                Quantity = qty,
+                Date = stockDate ?? DateTime.Today,
+                Description = string.IsNullOrWhiteSpace(stockDescription) ? "موجودی اول دوره انبار" : stockDescription
+            });
+            Toast.Success("موجودی اول دوره کالا ثبت شد.");
+            stockQuantityText = "";
+            await LoadGoodsTabAsync();
+        }
+        catch (Exception ex)
+        {
+            Toast.Error(ex.Message);
+        }
+        finally
+        {
+            savingStock = false;
+        }
+    }
+}
