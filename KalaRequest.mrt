@@ -38,11 +38,11 @@
     <Page1 Ref="3" type="Page" isKey="true">
       <Border>None;Black;2;Solid;False;4;Black</Border>
       <Brush>Transparent</Brush>
-      <Components isList="true" count="9">
+      <Components isList="true" count="8">
         <PageFooterBand1 Ref="4" type="PageFooterBand" isKey="true">
           <Brush>Transparent</Brush>
           <ClientRectangle>0,24.1,19,3.6</ClientRectangle>
-          <Components isList="true" count="3">
+          <Components isList="true" count="4">
             <Image1 Ref="5" type="Image" isKey="true">
               <Brush>Transparent</Brush>
               <ClientRectangle>0.4,0.1,4,2</ClientRectangle>
@@ -94,17 +94,33 @@
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
             </Text9>
+                      <Text_PageNumber Ref="42" type="Text" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>13.5,2.9,5,0.6</ClientRectangle>
+              <Conditions isList="true" count="0" />
+              <Expressions isList="true" count="0" />
+              <Font>B Yekan,9</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text_PageNumber</Name>
+              <Page isRef="3" />
+              <Parent isRef="4" />
+              <Text>صفحه {PageNumber} از {TotalPageCount}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
+              <Type>Expression</Type>
+              <VertAlignment>Center</VertAlignment>
+            </Text_PageNumber>
           </Components>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Name>PageFooterBand1</Name>
           <Page isRef="3" />
-          <Parent isRef="3" />
-        </PageFooterBand1>
+          <Parent isRef="3" /></PageFooterBand1>
         <HeaderBand1 Ref="11" type="HeaderBand" isKey="true">
           <Brush>Transparent</Brush>
           <ClientRectangle>0,0.4,19,2.4</ClientRectangle>
-          <Components isList="true" count="6">
+          <Components isList="true" count="7">
             <Text1 Ref="12" type="Text" isKey="true">
               <Border>None;[0:0:0];1;Solid;False;4;Black</Border>
               <Brush>Orange</Brush>
@@ -3173,6 +3189,19 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Parent isRef="11" />
               <ReferenceToGuid>56dd540e8cf64e9d97aa5f23a3bd9e7a</ReferenceToGuid>
             </EndPointPrimitive1>
+          
+
+<RoundedRectanglePrimitive1 Ref="33" type="Stimulsoft.Report.Components.StiRoundedRectanglePrimitive" isKey="true">
+              <ClientRectangle>0,0,19,2</ClientRectangle>
+              <Color>Black</Color>
+              <Conditions isList="true" count="0" />
+              <Expressions isList="true" count="0" />
+              <Guid>56dd540e8cf64e9d97aa5f23a3bd9e7a</Guid>
+              <Name>RoundedRectanglePrimitive1</Name>
+              <Page isRef="3" />
+              <Parent isRef="11" />
+              <Round>0.2</Round>
+                </RoundedRectanglePrimitive1>
           </Components>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
@@ -3192,6 +3221,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Hdr_ShomareDarkhast</Name>
@@ -3212,6 +3242,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Hdr_CodeKala</Name>
@@ -3232,6 +3263,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Hdr_KalaName</Name>
@@ -3252,6 +3284,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Hdr_Tozihat</Name>
@@ -3272,6 +3305,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Hdr_KalaTeadCount</Name>
@@ -3292,6 +3326,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>Hdr_DarkhastKonande</Name>
@@ -3339,6 +3374,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
           <Name>HeaderBand2</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
+          <PrintOnAllPages>True</PrintOnAllPages>
         </HeaderBand2>
         <DataDataSource1 Ref="26" type="DataBand" isKey="true">
           <Brush>Transparent</Brush>
@@ -3353,6 +3389,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>DataDataSource1_ShomareDarkhastslist</Name>
@@ -3373,6 +3410,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>DataDataSource1_CodeKala</Name>
@@ -3393,6 +3431,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>DataDataSource1_KalaName</Name>
@@ -3413,6 +3452,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,9</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>DataDataSource1_Tozihat</Name>
@@ -3433,6 +3473,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>DataDataSource1_KalaTeadCount</Name>
@@ -3453,6 +3494,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>B Yekan,10</Font>
+              <GrowToHeight>True</GrowToHeight>
               <HorAlignment>Center</HorAlignment>
               <Margins>0,0,0,0</Margins>
               <Name>DataDataSource1_UserName</Name>
@@ -3494,17 +3536,7 @@ LS0tLS2tUugfXKlRyD6Ozh4AAAAASUVORK5CYII=</ImageBytes>
           <Parent isRef="3" />
           <Sort isList="true" count="0" />
         </DataDataSource1>
-        <RoundedRectanglePrimitive1 Ref="33" type="Stimulsoft.Report.Components.StiRoundedRectanglePrimitive" isKey="true">
-          <ClientRectangle>0,0.4,19,2</ClientRectangle>
-          <Color>Black</Color>
-          <Conditions isList="true" count="0" />
-          <Expressions isList="true" count="0" />
-          <Guid>56dd540e8cf64e9d97aa5f23a3bd9e7a</Guid>
-          <Name>RoundedRectanglePrimitive1</Name>
-          <Page isRef="3" />
-          <Parent isRef="3" />
-          <Round>0.2</Round>
-        </RoundedRectanglePrimitive1>
+        
         <RoundedRectanglePrimitive2 Ref="34" type="Stimulsoft.Report.Components.StiRoundedRectanglePrimitive" isKey="true">
           <ClientRectangle>0.4,4,18.2,1.2</ClientRectangle>
           <Color>Black</Color>
